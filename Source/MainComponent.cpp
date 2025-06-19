@@ -30,7 +30,7 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    char p[] = "sineosc(asd, 440);";
+    char p[] = "sineosc(asd, 16); sineosc(asdf, asd*440);";
     int tokensLength = 0;
     Token* tokens = tokenize(p, &tokensLength);
     si = createSlangInterpreter(tokens, tokensLength);
