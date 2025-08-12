@@ -5,6 +5,15 @@ MainComponent::MainComponent()
 {
     // Make sure you set the size of the component after
     // you add any child components.
+    textEditor.setMultiLine(true);
+    textEditor.setReturnKeyStartsNewLine(true);
+    textEditor.setFont(juce::Font(juce::FontOptions(24)));
+    textEditor.setText("x = 13 + 3;");
+    addAndMakeVisible(&textEditor);
+
+    applyButton.setButtonText("Apply");
+    applyButton.addListener(this);
+    addAndMakeVisible(&applyButton);
     setSize (800, 600);
 
     // Some platforms require permissions to open input channels so request that here
@@ -17,7 +26,7 @@ MainComponent::MainComponent()
     else
     {
         // Specify the number of input and output channels that we want to open
-        setAudioChannels (2, 2);
+        setAudioChannels (0, 2);
     }
 }
 
@@ -27,28 +36,38 @@ MainComponent::~MainComponent()
     shutdownAudio();
 }
 
+void MainComponent::buttonClicked (juce::Button* button) {
+    if (button == &applyButton) {
+        std::cout << textEditor.getText() << std::endl;
+    }
+
+}
+
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    char p[] = "sineosc(asd, 16); sineosc(asdf, asd*440);";
+    char p[] = "x = sineosc(110);";
     int tokensLength = 0;
     Token* tokens = tokenize(p, &tokensLength);
     si = createSlangInterpreter(tokens, tokensLength);
     interpret(si);
-    sbc = createBufferCore(si, 512);
+    sbc = createBufferCore(si, 48000, 512);
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
     auto* outL = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
-    double* buf = renderBuffer(sbc);
+    auto* outR = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
+    float* buf = renderBuffer(sbc);
 
     for(int sample = 0; sample < bufferToFill.numSamples; sample++) {
         if(sample < 512) {
             outL[sample] = buf[sample];
+            outR[sample] = buf[sample];
         }
         else {
             outL[sample] = 0.f;
+            outR[sample] = 0.f;
         }
     }
 }
@@ -65,13 +84,15 @@ void MainComponent::releaseResources()
 void MainComponent::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (juce::Colours::white);
 
     // You can add your drawing code here!
 }
 
 void MainComponent::resized()
 {
+    textEditor.setBounds(10, 10, 780, 540);
+    applyButton.setBounds(50, 557, 100, 35);
     // This is called when the MainContentComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
