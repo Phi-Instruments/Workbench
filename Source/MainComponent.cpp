@@ -39,6 +39,15 @@ MainComponent::~MainComponent()
 void MainComponent::buttonClicked (juce::Button* button) {
     if (button == &applyButton) {
         std::cout << textEditor.getText() << std::endl;
+        free(si);
+        free(sbc);
+        int tokensLength = 0;
+        Token *tokens = tokenize((char*)textEditor.getText().toStdString().c_str(), &tokensLength);
+        si = createSlangInterpreter(tokens, tokensLength);
+        interpret(si);
+        sbc = createBufferCore(si, 48000, 512);
+        printAllVariables(si);
+        //printAllFunctions(si);
     }
 
 }
