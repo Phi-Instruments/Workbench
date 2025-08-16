@@ -43,7 +43,7 @@ void MainComponent::buttonClicked (juce::Button* button) {
         free(sbc);
         int tokensLength = 0;
         Token *tokens = tokenize((char*)textEditor.getText().toStdString().c_str(), &tokensLength);
-		std::cout << "Sending to interpreter: " << std::endl << textEditor.getText().toStdString().c_str() << std::endl << "program end ---" << std::endl;
+		//std::cout << "Sending to interpreter: " << std::endl << textEditor.getText().toStdString().c_str() << std::endl << "program end ---" << std::endl;
         si = createSlangInterpreter(tokens, tokensLength);
         interpret(si);
         sbc = createBufferCore(si, 48000, 512);
