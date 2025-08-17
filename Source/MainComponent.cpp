@@ -39,15 +39,16 @@ MainComponent::~MainComponent()
 void MainComponent::buttonClicked (juce::Button* button) {
     if (button == &applyButton) {
         std::cout << textEditor.getText() << std::endl;
-        free(si);
-        free(sbc);
+        //free(si);
+        //free(sbc);
         int tokensLength = 0;
-        Token *tokens = tokenize((char*)textEditor.getText().toStdString().c_str(), &tokensLength);
+		char *text = strdup(textEditor.getText().toStdString().c_str());
+        Token *tokens = tokenize(text, &tokensLength);
 		//std::cout << "Sending to interpreter: " << std::endl << textEditor.getText().toStdString().c_str() << std::endl << "program end ---" << std::endl;
         si = createSlangInterpreter(tokens, tokensLength);
         interpret(si);
-        sbc = createBufferCore(si, 48000, 512);
-        printAllVariables(si);
+        //sbc = createBufferCore(si, 48000, 512);
+        //printAllVariables(si);
         //printAllFunctions(si);
     }
 
