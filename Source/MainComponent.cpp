@@ -44,12 +44,19 @@ void MainComponent::buttonClicked (juce::Button* button) {
         int tokensLength = 0;
 		char *text = strdup(textEditor.getText().toStdString().c_str());
         Token *tokens = tokenize(text, &tokensLength);
+		std::cout << "Tokens length = " << tokensLength << std::endl;
+		for (int i = 0; i < tokensLength; i++) {
+    		std::cout << "Token[" << i << "] type=" << tokens[i].tt
+              		<< " value=" << (tokens[i].value ? tokens[i].value : "NULL")
+              		<< std::endl;
+		}
 		//std::cout << "Sending to interpreter: " << std::endl << textEditor.getText().toStdString().c_str() << std::endl << "program end ---" << std::endl;
         si = createSlangInterpreter(tokens, tokensLength);
         interpret(si);
         //sbc = createBufferCore(si, 48000, 512);
         //printAllVariables(si);
         //printAllFunctions(si);
+		free(text);
     }
 
 }
