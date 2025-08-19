@@ -6,9 +6,10 @@ MainComponent::MainComponent()
     // Make sure you set the size of the component after
     // you add any child components.
     textEditor.setMultiLine(true);
+    textEditor.setTabKeyUsedAsCharacter(true);
     textEditor.setReturnKeyStartsNewLine(true);
     textEditor.setFont(juce::Font(juce::FontOptions(24)));
-    textEditor.setText("x = 13 + 3;");
+    textEditor.setText("//<your slang script here>");
     addAndMakeVisible(&textEditor);
 
     applyButton.setButtonText("Apply");
@@ -38,7 +39,7 @@ MainComponent::~MainComponent()
 
 void MainComponent::buttonClicked (juce::Button* button) {
     if (button == &applyButton) {
-        char *p = (char*)textEditor.getText().toStdString().c_str();
+        char *p = strdup((char*)textEditor.getText().toStdString().c_str());
         applySlangScript(p);
     }
 
