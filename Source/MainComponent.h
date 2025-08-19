@@ -33,6 +33,7 @@ private:
     juce::Label label;
     juce::TextButton applyButton;
     void buttonClicked (juce::Button* button) override;
+    void applySlangScript(char* script);
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
