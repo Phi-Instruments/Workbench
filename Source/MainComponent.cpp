@@ -15,6 +15,22 @@ MainComponent::MainComponent()
     applyButton.setButtonText("Apply");
     applyButton.addListener(this);
     addAndMakeVisible(&applyButton);
+
+    saveFileButton.setButtonText("Save");
+    saveFileButton.addListener(this);
+    addAndMakeVisible(&saveFileButton);
+
+    loadFileButton.setButtonText("Load");
+    loadFileButton.addListener(this);
+    addAndMakeVisible(&loadFileButton);
+
+    saveToCloudButton.setButtonText("Save To Cloud");
+    saveToCloudButton.addListener(this);
+    addAndMakeVisible(&saveToCloudButton);
+
+    loadFromCloudButton.setButtonText("Load From Cloud");
+    loadFromCloudButton.addListener(this);
+    addAndMakeVisible(&loadFromCloudButton);
     setSize (800, 600);
 
     // Some platforms require permissions to open input channels so request that here
@@ -41,6 +57,9 @@ void MainComponent::buttonClicked (juce::Button* button) {
     if (button == &applyButton) {
         char *p = strdup((char*)textEditor.getText().toStdString().c_str());
         applySlangScript(p);
+    }
+    if (button == &saveFileButton) {
+
     }
 
 }
@@ -93,6 +112,10 @@ void MainComponent::resized()
 {
     textEditor.setBounds(10, 10, 780, 540);
     applyButton.setBounds(50, 557, 100, 35);
+	saveFileButton.setBounds(200, 557, 100, 35);
+	loadFileButton.setBounds(350, 557, 100, 35);
+	saveToCloudButton.setBounds(500, 557, 100, 35);
+    loadFromCloudButton.setBounds(650, 557, 100, 35);
     // This is called when the MainContentComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.

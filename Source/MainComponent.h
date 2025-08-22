@@ -32,6 +32,10 @@ private:
     juce::TextEditor textEditor;
     juce::Label label;
     juce::TextButton applyButton;
+    juce::TextButton saveFileButton;
+    juce::TextButton loadFileButton;
+    juce::TextButton saveToCloudButton;
+    juce::TextButton loadFromCloudButton;
     void buttonClicked (juce::Button* button) override;
     void applySlangScript(char* script);
 
