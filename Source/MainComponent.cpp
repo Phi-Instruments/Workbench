@@ -59,7 +59,26 @@ void MainComponent::buttonClicked (juce::Button* button) {
         applySlangScript(p);
     }
     if (button == &saveFileButton) {
+        auto* w = new juce::AlertWindow ("Filename", "Please enter a file name for this script", juce::AlertWindow::AlertIconType::NoIcon);
 
+        w->addTextEditor ("inputField", "", "filename:");
+        w->addButton ("OK", 1, juce::KeyPress (juce::KeyPress::returnKey));
+        w->addButton ("Cancel", 0, juce::KeyPress (juce::KeyPress::escapeKey));
+
+        w->centreWithSize (400, 200);
+
+        // Wichtig: mit Callback starten
+        w->enterModalState (true,
+            juce::ModalCallbackFunction::create([w](int result)
+            {
+                if (result != 0) // OK gedrückt?
+                {
+                    auto text = w->getTextEditorContents ("inputField");
+                    DBG ("Eingabe: " << text);
+                }
+                delete w; // selbst freigeben
+            }),
+        true);
     }
 
 }
@@ -116,9 +135,6 @@ void MainComponent::resized()
 	loadFileButton.setBounds(350, 557, 100, 35);
 	saveToCloudButton.setBounds(500, 557, 100, 35);
     loadFromCloudButton.setBounds(650, 557, 100, 35);
-    // This is called when the MainContentComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
 }
 
 void MainComponent::applySlangScript(char* script) {
