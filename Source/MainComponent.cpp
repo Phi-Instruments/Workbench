@@ -59,28 +59,37 @@ void MainComponent::buttonClicked (juce::Button* button) {
         applySlangScript(p);
     }
     if (button == &saveFileButton) {
-        auto* w = new juce::AlertWindow ("Filename", "Please enter a file name for this script", juce::AlertWindow::AlertIconType::NoIcon);
+        auto* chooser = new juce::FileChooser("Bitte Datei auswählen...", juce::File{}, "*.slang");
 
-        w->addTextEditor ("inputField", "", "filename:");
-        w->addButton ("OK", 1, juce::KeyPress (juce::KeyPress::returnKey));
-        w->addButton ("Cancel", 0, juce::KeyPress (juce::KeyPress::escapeKey));
-
-        w->centreWithSize (400, 200);
-
-        // Wichtig: mit Callback starten
-        w->enterModalState (true,
-            juce::ModalCallbackFunction::create([w](int result)
+        chooser->launchAsync(
+            juce::FileBrowserComponent::saveMode |
+            juce::FileBrowserComponent::canSelectFiles,
+            [this, chooser](const juce::FileChooser& fc)
             {
-                if (result != 0) // OK gedrückt?
-                {
-                    auto text = w->getTextEditorContents ("inputField");
-                    DBG ("Eingabe: " << text);
-                }
-                delete w; // selbst freigeben
-            }),
-        true);
-    }
+                juce::File file = fc.getResult();
 
+                DBG("Save Datei: " << file.getFullPathName());
+
+                delete chooser; // freigeben
+            }
+        );
+    }
+    if (button == &loadFileButton) {
+        auto* chooser = new juce::FileChooser("Bitte Datei auswählen...", juce::File{}, "*.slang");
+
+        chooser->launchAsync(
+            juce::FileBrowserComponent::openMode |
+            juce::FileBrowserComponent::canSelectFiles,
+            [this, chooser](const juce::FileChooser& fc)
+            {
+                juce::File file = fc.getResult();
+                if (file.existsAsFile())
+                    DBG("Gewählte Datei: " << file.getFullPathName());
+
+                delete chooser; // freigeben
+            }
+        );
+    }
 }
 
 //==============================================================================
