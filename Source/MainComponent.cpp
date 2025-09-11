@@ -163,7 +163,7 @@ void MainComponent::resized()
 
 void MainComponent::applySlangScript(char* script) {
     if (si != NULL) {
-        free(si);
+        destroySlangInterpreter(si);
     }
     if (sbc != NULL) {
         free(sbc);
