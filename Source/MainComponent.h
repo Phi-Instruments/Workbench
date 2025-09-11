@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <fstream>
 #include "/home/sten/AudioProgramming/Slang/slang-lib.h"
 
 //==============================================================================

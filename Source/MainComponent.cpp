@@ -69,6 +69,9 @@ void MainComponent::buttonClicked (juce::Button* button) {
                 juce::File file = fc.getResult();
 
                 DBG("Save Datei: " << file.getFullPathName());
+                std::ofstream saveFile(file.getFullPathName().toStdString());
+                saveFile << textEditor.getText().toStdString();
+                saveFile.close();
 
                 delete chooser; // freigeben
             }
@@ -83,8 +86,19 @@ void MainComponent::buttonClicked (juce::Button* button) {
             [this, chooser](const juce::FileChooser& fc)
             {
                 juce::File file = fc.getResult();
-                if (file.existsAsFile())
+                if (file.existsAsFile()) {
                     DBG("Gewählte Datei: " << file.getFullPathName());
+                    std::ifstream loadFile(file.getFullPathName().toStdString());
+
+                    std::stringstream strStream;
+                    strStream << loadFile.rdbuf(); //read the file
+                    std::string str = strStream.str();
+
+                    char *P = strdup((char*)str.c_str());
+                    loadFile.close();
+                    textEditor.setText(str);
+                    //applySlangScript(p);
+                }
 
                 delete chooser; // freigeben
             }
