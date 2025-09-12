@@ -118,17 +118,20 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     auto* outR = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
     if (sbc) {
         float* buf = renderBuffer(sbc);
-
-        for(int sample = 0; sample < bufferToFill.numSamples; sample++) {
-            if(sample < 512) {
-                outL[sample] = buf[sample]*0.5;
-                outR[sample] = buf[sample]*0.5;
-            }
-            else {
-                outL[sample] = 0.f;
-                outR[sample] = 0.f;
+        if (buf != NULL) {
+            for(int sample = 0; sample < bufferToFill.numSamples; sample++) {
+                if(sample < 512) {
+                    outL[sample] = buf[sample]*0.5;
+                    outR[sample] = buf[sample]*0.5;
+                }
+                else {
+                    outL[sample] = 0.f;
+                    outR[sample] = 0.f;
+                }
             }
         }
+
+        
     }
 
 }
@@ -166,7 +169,7 @@ void MainComponent::applySlangScript(char* script) {
         destroySlangInterpreter(si);
     }
     if (sbc != NULL) {
-        free(sbc);
+        destroyBufferCore(sbc);
     }
     int tokensLength = 0;
     Token *tokens = tokenize(script, &tokensLength);
