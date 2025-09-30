@@ -9,7 +9,7 @@ MainComponent::MainComponent()
     textEditor.setTabKeyUsedAsCharacter(true);
     textEditor.setReturnKeyStartsNewLine(true);
     textEditor.setFont(juce::Font(juce::FontOptions(24)));
-    textEditor.setText("x = sawtoothosc(110);");
+    textEditor.setText("x = sawtoothosc(110);\nlowpassfilter(220);");
     addAndMakeVisible(&textEditor);
 
     applyButton.setButtonText("Apply");
@@ -110,7 +110,7 @@ void MainComponent::buttonClicked (juce::Button* button) {
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
     int tokensLength = 0;
-    char *cscript = strdup("x = sawtoothosc(110);");
+    char *cscript = strdup("x = sawtoothosc(110); lowpassfilter(220);");
     std::cout << "Script: " << cscript << std::endl;
     Token *tokens = tokenize(cscript, &tokensLength);
     free(cscript); // Speicher direkt nach dem Tokenisieren freigeben!
@@ -195,9 +195,11 @@ void MainComponent::resized()
 void MainComponent::applySlangScript(char* script) {
     if (si != NULL) {
         destroySlangInterpreter(si);
+        si = NULL;
     }
     if (sbc != NULL) {
         destroyBufferCore(sbc);
+        sbc = NULL;
     }
     int tokensLength = 0;
     char *cscript = (char*)malloc(1024 * sizeof(char));
