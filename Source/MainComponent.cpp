@@ -9,7 +9,7 @@ MainComponent::MainComponent()
     textEditor.setTabKeyUsedAsCharacter(true);
     textEditor.setReturnKeyStartsNewLine(true);
     textEditor.setFont(juce::Font(juce::FontOptions(24)));
-    textEditor.setText("//<your slang script here>");
+    textEditor.setText("x = sawtoothosc(110);");
     addAndMakeVisible(&textEditor);
 
     applyButton.setButtonText("Apply");
@@ -109,7 +109,29 @@ void MainComponent::buttonClicked (juce::Button* button) {
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-
+    int tokensLength = 0;
+    char *cscript = strdup("x = sawtoothosc(110);");
+    std::cout << "Script: " << cscript << std::endl;
+    Token *tokens = tokenize(cscript, &tokensLength);
+    free(cscript); // Speicher direkt nach dem Tokenisieren freigeben!
+    std::cout << "Tokens length = " << tokensLength << std::endl;
+    if (!tokens || tokensLength == 0) {
+        std::cerr << "Tokenizing failed!" << std::endl;
+        return;
+    }
+    si = createSlangInterpreter(tokens, tokensLength);
+    if (!si) {
+        std::cerr << "Interpreter creation failed!" << std::endl;
+        return;
+    }
+    interpret(si);
+    sbc = createBufferCore(si, 48000, 512);
+    if (!sbc) {
+        std::cerr << "BufferCore creation failed!" << std::endl;
+        return;
+    }
+    printAllVariables(si);
+    printAllFunctions(si);
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
@@ -118,22 +140,28 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     auto* outR = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
     if (sbc) {
         float* buf = renderBuffer(sbc);
-        if (buf != NULL) {
+        if (!buf) {
+            std::cerr << "renderBuffer returned NULL!" << std::endl;
             for(int sample = 0; sample < bufferToFill.numSamples; sample++) {
-                if(sample < 512) {
-                    outL[sample] = buf[sample]*0.5;
-                    outR[sample] = buf[sample]*0.5;
-                }
-                else {
-                    outL[sample] = 0.f;
-                    outR[sample] = 0.f;
-                }
+                outL[sample] = 0.f;
+                outR[sample] = 0.f;
+            }
+            return;
+        }
+        // Optional: Buffergröße abfragen, z.B. sbc->bufferSize
+        int bufSize = 512; // oder dynamisch aus sbc holen
+        for(int sample = 0; sample < bufferToFill.numSamples; sample++) {
+            if(sample < bufSize) {
+                outL[sample] = buf[sample]*0.5;
+                outR[sample] = buf[sample]*0.5;
+            }
+            else {
+                outL[sample] = 0.f;
+                outR[sample] = 0.f;
             }
         }
-
-        
     }
-
+    
 }
 
 void MainComponent::releaseResources()
@@ -172,7 +200,10 @@ void MainComponent::applySlangScript(char* script) {
         destroyBufferCore(sbc);
     }
     int tokensLength = 0;
-    Token *tokens = tokenize(script, &tokensLength);
+    char *cscript = (char*)malloc(1024 * sizeof(char));
+    strcpy(cscript, script);
+    std::cout << "Script: " << cscript << std::endl;
+    Token *tokens = tokenize(cscript, &tokensLength);
     std::cout << "Tokens length = " << tokensLength << std::endl;
     si = createSlangInterpreter(tokens, tokensLength);
     interpret(si);
