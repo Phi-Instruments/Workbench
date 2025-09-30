@@ -124,8 +124,8 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
         std::cerr << "Interpreter creation failed!" << std::endl;
         return;
     }
-    interpret(si);
     sbc = createBufferCore(si, 48000, 512);
+    interpret(si);
     if (!sbc) {
         std::cerr << "BufferCore creation failed!" << std::endl;
         return;
@@ -206,8 +206,8 @@ void MainComponent::applySlangScript(char* script) {
     Token *tokens = tokenize(cscript, &tokensLength);
     std::cout << "Tokens length = " << tokensLength << std::endl;
     si = createSlangInterpreter(tokens, tokensLength);
-    interpret(si);
     sbc = createBufferCore(si, 48000, 512);
+    interpret(si);
     printAllVariables(si);
     printAllFunctions(si);
 }
